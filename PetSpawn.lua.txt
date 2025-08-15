@@ -1,0 +1,183 @@
+--[[ 
+    Roblox Lua LocalScript: Pet Spawner Hack with Key GUI
+    Place in StarterGui > LocalScript for testing.
+    You can replace pet spawning logic with your own game logic.
+]]
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+--[[--- GUI Creation Functions ---]]
+local function createKeySystemGui()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "KeySystemGui"
+    screenGui.ResetOnSpawn = false
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 400, 0, 200)
+    mainFrame.Position = UDim2.new(0.5, -200, 0.4, -100)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Parent = screenGui
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 40)
+    title.Position = UDim2.new(0, 0, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Text = "Key system"
+    title.TextColor3 = Color3.fromRGB(220, 220, 220)
+    title.Font = Enum.Font.SourceSansBold
+    title.TextSize = 28
+    title.Parent = mainFrame
+
+    local keyBox = Instance.new("TextBox")
+    keyBox.Size = UDim2.new(0.8, 0, 0, 36)
+    keyBox.Position = UDim2.new(0.1, 0, 0.35, 0)
+    keyBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    keyBox.TextColor3 = Color3.fromRGB(230,230,230)
+    keyBox.Font = Enum.Font.SourceSans
+    keyBox.TextSize = 24
+    keyBox.PlaceholderText = "Key : ....."
+    keyBox.Parent = mainFrame
+
+    local checkBtn = Instance.new("TextButton")
+    checkBtn.Size = UDim2.new(0.4, 0, 0, 36)
+    checkBtn.Position = UDim2.new(0.3, 0, 0.7, 0)
+    checkBtn.Text = "Check key"
+    checkBtn.BackgroundColor3 = Color3.fromRGB(120,120,120)
+    checkBtn.TextColor3 = Color3.fromRGB(230,230,230)
+    checkBtn.Font = Enum.Font.SourceSansBold
+    checkBtn.TextSize = 22
+    checkBtn.Parent = mainFrame
+
+    local info = Instance.new("TextLabel")
+    info.Size = UDim2.new(1, 0, 0, 28)
+    info.Position = UDim2.new(0,0, 0.9, 0)
+    info.BackgroundTransparency = 1
+    info.Text = ""
+    info.TextColor3 = Color3.new(1,0.1,0.1)
+    info.Font = Enum.Font.SourceSans
+    info.TextSize = 20
+    info.Parent = mainFrame
+
+    return screenGui, keyBox, checkBtn, info
+end
+
+local function createSpawnerGui()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "SpawnerPetGui"
+    screenGui.ResetOnSpawn = false
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 500, 0, 350)
+    mainFrame.Position = UDim2.new(0.5, -250, 0.35, -175)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Parent = screenGui
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 40)
+    title.Position = UDim2.new(0, 0, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Text = "Spawner pet"
+    title.TextColor3 = Color3.fromRGB(220, 220, 220)
+    title.Font = Enum.Font.SourceSansBold
+    title.TextSize = 30
+    title.Parent = mainFrame
+
+    local nameBox = Instance.new("TextBox")
+    nameBox.Size = UDim2.new(0.85, 0, 0, 36)
+    nameBox.Position = UDim2.new(0.075, 0, 0.2, 0)
+    nameBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    nameBox.TextColor3 = Color3.fromRGB(230,230,230)
+    nameBox.Font = Enum.Font.SourceSans
+    nameBox.TextSize = 22
+    nameBox.PlaceholderText = "Name pet : ....(Write name of pet to spawn)"
+    nameBox.Parent = mainFrame
+
+    local ageBox = Instance.new("TextBox")
+    ageBox.Size = UDim2.new(0.85, 0, 0, 36)
+    ageBox.Position = UDim2.new(0.075, 0, 0.37, 0)
+    ageBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    ageBox.TextColor3 = Color3.fromRGB(230,230,230)
+    ageBox.Font = Enum.Font.SourceSans
+    ageBox.TextSize = 22
+    ageBox.PlaceholderText = "Age pet : ....(Write age of pet to spawn)"
+    ageBox.Parent = mainFrame
+
+    local kgBox = Instance.new("TextBox")
+    kgBox.Size = UDim2.new(0.85, 0, 0, 36)
+    kgBox.Position = UDim2.new(0.075, 0, 0.54, 0)
+    kgBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    kgBox.TextColor3 = Color3.fromRGB(230,230,230)
+    kgBox.Font = Enum.Font.SourceSans
+    kgBox.TextSize = 22
+    kgBox.PlaceholderText = "Kg pet : ....(Write kg of pet to spawn)"
+    kgBox.Parent = mainFrame
+
+    local spawnBtn = Instance.new("TextButton")
+    spawnBtn.Size = UDim2.new(0.5, 0, 0, 48)
+    spawnBtn.Position = UDim2.new(0.25, 0, 0.75, 0)
+    spawnBtn.Text = "Spawn pet"
+    spawnBtn.BackgroundColor3 = Color3.fromRGB(120,120,120)
+    spawnBtn.TextColor3 = Color3.fromRGB(230,230,230)
+    spawnBtn.Font = Enum.Font.SourceSansBold
+    spawnBtn.TextSize = 26
+    spawnBtn.Parent = mainFrame
+
+    local info = Instance.new("TextLabel")
+    info.Size = UDim2.new(1, 0, 0, 28)
+    info.Position = UDim2.new(0,0, 0.9, 0)
+    info.BackgroundTransparency = 1
+    info.Text = ""
+    info.TextColor3 = Color3.new(0.1,1,0.1)
+    info.Font = Enum.Font.SourceSans
+    info.TextSize = 20
+    info.Parent = mainFrame
+
+    return screenGui, nameBox, ageBox, kgBox, spawnBtn, info
+end
+
+--[[--- Main Logic ---]]
+local function showKeyGui()
+    local keyGui, keyBox, checkBtn, infoLabel = createKeySystemGui()
+    keyGui.Parent = LocalPlayer.PlayerGui
+
+    checkBtn.MouseButton1Click:Connect(function()
+        local keyInput = keyBox.Text
+        if keyInput == "Nhanhub" then
+            keyGui:Destroy()
+            showSpawnerGui()
+        else
+            infoLabel.Text = "Sai key! Key phải là Nhanhub."
+        end
+    end)
+end
+
+local function showSpawnerGui()
+    local spawnerGui, nameBox, ageBox, kgBox, spawnBtn, infoLabel = createSpawnerGui()
+    spawnerGui.Parent = LocalPlayer.PlayerGui
+
+    spawnBtn.MouseButton1Click:Connect(function()
+        local petName = nameBox.Text
+        local petAge = ageBox.Text
+        local petKg = kgBox.Text
+
+        if petName == "" or petAge == "" or petKg == "" then
+            infoLabel.Text = "Vui lòng nhập đủ thông tin pet!"
+            infoLabel.TextColor3 = Color3.new(1,0.1,0.1)
+            return
+        end
+
+        -- Replace this section with your actual pet-spawning logic!
+        infoLabel.Text = "Đã spawn pet: "..petName.." | Tuổi: "..petAge.." | Kg: "..petKg
+        infoLabel.TextColor3 = Color3.new(0.1,1,0.1)
+
+        -- Example: If you have a RemoteEvent for spawning pets:
+        -- ReplicatedStorage:FindFirstChild("SpawnPetEvent"):FireServer(petName, petAge, petKg)
+    end)
+end
+
+-- Start the hack UI
+showKeyGui()
